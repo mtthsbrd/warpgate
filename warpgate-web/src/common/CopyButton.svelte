@@ -46,6 +46,8 @@
     {color}
     {disabled}
     type="button"
+    aria-label={label || 'Copy to clipboard'}
+    title={label ? undefined : 'Copy to clipboard'}
 >
     {#if children}
         {@render children()}
