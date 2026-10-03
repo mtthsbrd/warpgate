@@ -28,6 +28,20 @@ impl<E: Endpoint> Endpoint for ContentSecurityPolicyEndpoint<E> {
                 HeaderValue::from_static(WARPGATE_CSP),
             );
         }
+        // Prevent Clickjacking attacks
+        if !resp.headers().contains_key(header::X_FRAME_OPTIONS) {
+            resp.headers_mut().insert(
+                header::X_FRAME_OPTIONS,
+                HeaderValue::from_static("SAMEORIGIN"),
+            );
+        }
+        // Prevent MIME type sniffing
+        if !resp.headers().contains_key(header::X_CONTENT_TYPE_OPTIONS) {
+            resp.headers_mut().insert(
+                header::X_CONTENT_TYPE_OPTIONS,
+                HeaderValue::from_static("nosniff"),
+            );
+        }
         Ok(resp)
     }
 }
@@ -46,6 +60,14 @@ mod tests {
         assert_eq!(
             resp.headers().get(header::CONTENT_SECURITY_POLICY).unwrap(),
             WARPGATE_CSP
+        );
+        assert_eq!(
+            resp.headers().get(header::X_FRAME_OPTIONS).unwrap(),
+            "SAMEORIGIN"
+        );
+        assert_eq!(
+            resp.headers().get(header::X_CONTENT_TYPE_OPTIONS).unwrap(),
+            "nosniff"
         );
     }
 
