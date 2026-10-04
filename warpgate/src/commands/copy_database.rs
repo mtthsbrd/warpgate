@@ -22,6 +22,7 @@ macro_rules! with_every_table_in_order {
             Node,
             LdapServer,
             SshClientKey,
+            SecretBackend,
             TargetGroup,
             KnownHost,
             IpBlock,
@@ -81,7 +82,7 @@ pub async fn command(params: &GlobalParams, target_url: &str) -> Result<()> {
         .await
         .context("Failed to connect to the target database")?;
 
-    set_config_migration_values(ConfigMigrationValues::from_config(&config, params)?);
+    set_config_migration_values(ConfigMigrationValues::from_config(&config));
 
     info!("Creating the schema");
     migrate_all(&target).await?;
