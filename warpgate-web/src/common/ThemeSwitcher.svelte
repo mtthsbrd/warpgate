@@ -27,7 +27,7 @@
     )
 </script>
 
-<Button color="link" on:click={toggle} id="button" aria-label={computedAriaLabel} title="Switch theme">
+<Button color="link" on:click={toggle} id="button" aria-label={computedAriaLabel}>
     {#if $currentTheme === 'dark'}
         <Fa fw icon={faMoon} />
     {:else if $currentTheme === 'light'}
