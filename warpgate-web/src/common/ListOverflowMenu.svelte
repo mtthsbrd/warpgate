@@ -20,7 +20,7 @@
 
 {#if children || groupControls.available}
     <Dropdown>
-        <DropdownToggle color="link">
+        <DropdownToggle color="link" aria-label="More options" title="More options">
             <Fa icon={faEllipsisV} fw />
         </DropdownToggle>
         <DropdownMenu end>
