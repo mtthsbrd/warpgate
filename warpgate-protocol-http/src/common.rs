@@ -45,7 +45,7 @@ pub static X_WARPGATE_TOKEN: HeaderName = HeaderName::from_static("x-warpgate-to
 /// applied at the middleware wiring, where the write happens.
 pub fn session_cookie_config() -> CookieConfig {
     CookieConfig::default()
-        .secure(false)
+        .secure(true)
         .name(SESSION_COOKIE_NAME)
 }
 
