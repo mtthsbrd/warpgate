@@ -26,6 +26,10 @@
     }: Props = $props()
     let successVisible = $state(false)
 
+    let computedAriaLabel = $derived(
+        label ? label : (successVisible ? "Copied!" : "Copy to clipboard")
+    )
+
     async function _click(e: MouseEvent) {
         e.preventDefault()
         if (disabled) {
@@ -46,6 +50,8 @@
     {color}
     {disabled}
     type="button"
+    aria-label={computedAriaLabel}
+    title={computedAriaLabel}
 >
     {#if children}
         {@render children()}
