@@ -154,6 +154,9 @@
     }
 
     async function clearAndReload() {
+        if (searchTimeout) {
+            clearTimeout(searchTimeout)
+        }
         items = []
         visibleItems = []
         endReached = false
@@ -164,14 +167,22 @@
         }
     }
 
-    function search() {
+    function search(immediate = false) {
         if (searchTimeout) {
             clearTimeout(searchTimeout)
+        }
+        if (immediate) {
+            loadOlder(true).catch(async e => {
+                error = await stringifyError(e)
+            })
+            return
         }
         // ⚡ Bolt optimization: Debounce API calls triggered by rapid keystrokes
         // Reduces load on the backend and unnecessary re-renders when user types quickly
         searchTimeout = setTimeout(() => {
-            loadOlder(true)
+            loadOlder(true).catch(async e => {
+                error = await stringifyError(e)
+            })
         }, 300)
     }
 
@@ -445,7 +456,8 @@
         class="form-control form-control-sm flex-grow-1"
         style="min-width: 12rem"
         bind:value={searchQuery}
-        onkeyup={() => search()}
+        oninput={() => search()}
+        onkeydown={(e) => e.key === 'Enter' && search(true)}
     >
     <AsyncButton
         id="clearAndReloadButton"
