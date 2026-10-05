@@ -21,13 +21,20 @@
     }
 
     let computedAriaLabel = $derived(
-        $currentTheme === 'dark' ? "Switch to light theme" :
-        $currentTheme === 'light' ? "Switch to automatic theme" :
-        "Switch to dark theme"
+        $currentTheme === 'dark'
+            ? 'Switch to light theme'
+            : $currentTheme === 'light'
+              ? 'Switch to automatic theme'
+              : 'Switch to dark theme',
     )
 </script>
 
-<Button color="link" on:click={toggle} id="button" aria-label={computedAriaLabel}>
+<Button
+    color="link"
+    on:click={toggle}
+    id="button"
+    aria-label={computedAriaLabel}
+>
     {#if $currentTheme === 'dark'}
         <Fa fw icon={faMoon} />
     {:else if $currentTheme === 'light'}

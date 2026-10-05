@@ -54,6 +54,7 @@
                     color="link"
                     size="sm"
                     on:click={() => removeIpRange(index)}
+                    aria-label="Remove IP range"
                 >
                     <Fa icon={faTrash} />
                 </Button>

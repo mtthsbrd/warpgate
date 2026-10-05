@@ -27,7 +27,7 @@
     let successVisible = $state(false)
 
     let computedAriaLabel = $derived(
-        label ? label : (successVisible ? "Copied!" : "Copy to clipboard")
+        label ? label : successVisible ? 'Copied!' : 'Copy to clipboard',
     )
 
     async function _click(e: MouseEvent) {

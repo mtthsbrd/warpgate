@@ -289,7 +289,12 @@
                 {/if}
             </small>
             {#if target.kind === TargetKind.Http}
-                <Button color="link" size="sm" tabindex={-1}>
+                <Button
+                    color="link"
+                    size="sm"
+                    tabindex={-1}
+                    aria-label="Connect to HTTP target"
+                >
                     <Fa icon={faArrowRight} fw />
                 </Button>
             {/if}
@@ -297,6 +302,7 @@
                 <DropdownToggle
                     color="link"
                     size="sm"
+                    aria-label="Target options"
                     onclick={e => {
                     e.preventDefault()
                     e.stopPropagation()

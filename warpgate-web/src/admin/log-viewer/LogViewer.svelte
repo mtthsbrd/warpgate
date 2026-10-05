@@ -519,6 +519,7 @@
         click={clearAndReload}
         size="sm"
         disabled={loading}
+        aria-label="Clear view and reload latest log"
     >
         <Fa icon={faRotateRight} fw />
     </AsyncButton>
@@ -531,6 +532,7 @@
         click={downloadLogs}
         size="sm"
         disabled={loading && !visibleItems}
+        aria-label="Download all matching logs"
     >
         <Fa icon={faDownload} fw />
     </AsyncButton>

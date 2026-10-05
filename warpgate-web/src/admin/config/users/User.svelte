@@ -468,6 +468,7 @@
                                             id="options-button-{role.id}"
                                             color="link"
                                             on:click={() => openExpiryModal(activeAssignment)}
+                                            aria-label="Options"
                                         >
                                             <Fa icon={faWrench} />
                                         </Button>

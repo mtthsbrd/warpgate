@@ -22,6 +22,7 @@
         class?: string
         size?: 'sm' | 'lg'
         id?: string
+        'aria-label'?: string
         children?: Snippet
     }
 
@@ -35,6 +36,7 @@
         class: cls = '',
         id = '',
         size,
+        'aria-label': ariaLabel,
     }: Props = $props()
 
     let button: HTMLElement | undefined = $state()
@@ -98,6 +100,7 @@
     {size}
     {id}
     {disabled}
+    aria-label={ariaLabel}
 >
     {#if st === State.Normal || st === State.Progress}
         {#if children}
