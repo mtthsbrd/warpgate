@@ -289,12 +289,13 @@
                 {/if}
             </small>
             {#if target.kind === TargetKind.Http}
-                <Button color="link" size="sm" tabindex={-1}>
+                <Button color="link" size="sm" tabindex={-1} aria-label="Open HTTP target {target.name}">
                     <Fa icon={faArrowRight} fw />
                 </Button>
             {/if}
             <Dropdown>
                 <DropdownToggle
+                    aria-label="Target actions for {target.name}"
                     color="link"
                     size="sm"
                     onclick={e => {
