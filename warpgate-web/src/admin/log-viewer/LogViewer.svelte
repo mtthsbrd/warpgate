@@ -45,6 +45,8 @@
     let loadOlderButton: HTMLButtonElement | undefined = $state()
     let reloadInterval: ReturnType<typeof setInterval>
     let searchQuery = $state('')
+    // Bolt ⚡: Track debounce timeout for search input
+    let searchTimeout: ReturnType<typeof setTimeout> | undefined
     let scrollEl: HTMLDivElement | undefined = $state()
 
     let virtualizerStore = createVirtualizer<HTMLDivElement, HTMLDivElement>({
@@ -74,6 +76,12 @@
             },
         }
     }
+
+    onDestroy(() => {
+        if (searchTimeout) {
+            clearTimeout(searchTimeout)
+        }
+    })
 
     $effect(() => {
         const list = visibleItems
@@ -164,7 +172,14 @@
     }
 
     function search() {
-        loadOlder(true)
+        // Bolt ⚡: Debounce search input to avoid making an API request on every keystroke,
+        // reducing backend strain and UI thrashing while typing.
+        if (searchTimeout) {
+            clearTimeout(searchTimeout)
+        }
+        searchTimeout = setTimeout(() => {
+            loadOlder(true)
+        }, 300)
     }
 
     function stringifyDate(date: Date) {
