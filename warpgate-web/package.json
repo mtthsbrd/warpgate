@@ -71,6 +71,7 @@
     },
     "dependencies": {
         "@tanstack/svelte-virtual": "^3.13.39",
+        "base32-encode": "^2.0.0",
         "natural-orderby": "^5.0.0"
     }
 }
