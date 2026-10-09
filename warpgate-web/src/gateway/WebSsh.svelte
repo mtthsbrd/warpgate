@@ -399,7 +399,7 @@
             {/if}
 
             <Dropdown bind:isOpen={menuOpen}>
-                <DropdownToggle color="secondary" caret={false}>
+                <DropdownToggle aria-label="Settings" color="secondary" caret={false}>
                     <Fa icon={faGear} />
                 </DropdownToggle>
                 <DropdownMenu end>

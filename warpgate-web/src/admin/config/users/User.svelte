@@ -464,7 +464,7 @@
                                 </div>
                                 <div class="d-flex gap-2">
                                     {#if isActive && activeAssignment}
-                                        <Button
+                                        <Button aria-label="Role options"
                                             id="options-button-{role.id}"
                                             color="link"
                                             on:click={() => openExpiryModal(activeAssignment)}

@@ -289,7 +289,7 @@
                 {/if}
             </small>
             {#if target.kind === TargetKind.Http}
-                <Button color="link" size="sm" tabindex={-1}>
+                <Button aria-label="Open HTTP target" color="link" size="sm" tabindex={-1}>
                     <Fa icon={faArrowRight} fw />
                 </Button>
             {/if}

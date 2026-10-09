@@ -50,7 +50,7 @@
                     }}
                     invalid={!!range?.trim() && !isValidCidr(range)}
                 />
-                <Button
+                <Button aria-label="Remove IP range"
                     color="link"
                     size="sm"
                     on:click={() => removeIpRange(index)}
