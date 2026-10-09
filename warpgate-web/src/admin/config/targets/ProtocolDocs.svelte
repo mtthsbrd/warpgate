@@ -2,6 +2,7 @@
     import CollapsibleBlock from 'common/CollapsibleBlock.svelte'
     import type { TargetKind } from 'gateway/lib/api'
     import snarkdown from 'snarkdown'
+    import DOMPurify from 'dompurify'
     import { protocolInfo } from './protocolInfo'
 
     interface Props {
@@ -11,7 +12,7 @@
     const { kind }: Props = $props()
 
     const markdown = $derived(protocolInfo[kind])
-    const html = $derived(markdown ? snarkdown(markdown) : undefined)
+    const html = $derived(markdown ? DOMPurify.sanitize(snarkdown(markdown)) : undefined)
 </script>
 
 {#if html}

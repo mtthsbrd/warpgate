@@ -21,6 +21,7 @@
     import active from 'svelte-spa-router/active'
     import { wrap } from 'svelte-spa-router/wrap'
     import AnalyticsConsentModal from './AnalyticsConsentModal.svelte'
+    import DOMPurify from 'dompurify'
     import { ADMIN_PERMISSIONS } from './lib/store'
 
     let showAnalyticsModal = $state(false)
@@ -145,7 +146,7 @@
                     <strong>Issues found:</strong>
                     <ul class="mb-0 mt-2">
                         {#each $serverInfo.configWarnings as warning (warning)}
-                            <li>{@html warning}</li>
+                            <li>{@html DOMPurify.sanitize(warning)}</li>
                         {/each}
                     </ul>
                 </Alert>
