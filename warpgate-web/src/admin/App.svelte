@@ -4,6 +4,7 @@
     import { Alert } from '@sveltestrap/sveltestrap'
     import AuthBar from 'common/AuthBar.svelte'
     import Brand from 'common/Brand.svelte'
+    import DOMPurify from 'dompurify'
     import Loadable from 'common/Loadable.svelte'
     import Redirect from 'common/Redirect.svelte'
     import RequestsButton from 'common/RequestsButton.svelte'
@@ -118,7 +119,7 @@
             {#if $serverInfo?.username}
                 <a
                     use:link
-                    use:active={{path: /^\/status\//}}
+                    use:active={{ path: /^\/status\// }}
                     href="/status/sessions"
                 >
                     Status
@@ -126,7 +127,7 @@
                 <a
                     use:link
                     use:active
-                    use:active={{path: /^\/config\//}}
+                    use:active={{ path: /^\/config\// }}
                     href="/config"
                 >
                     Config
@@ -145,7 +146,8 @@
                     <strong>Issues found:</strong>
                     <ul class="mb-0 mt-2">
                         {#each $serverInfo.configWarnings as warning (warning)}
-                            <li>{@html warning}</li>
+                            <!-- DOMPurify sanitizes warnings from config, preventing XSS -->
+                            <li>{@html DOMPurify.sanitize(warning)}</li>
                         {/each}
                     </ul>
                 </Alert>

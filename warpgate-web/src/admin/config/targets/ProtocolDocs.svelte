@@ -1,5 +1,6 @@
 <script lang="ts">
     import CollapsibleBlock from 'common/CollapsibleBlock.svelte'
+    import DOMPurify from 'dompurify'
     import type { TargetKind } from 'gateway/lib/api'
     import snarkdown from 'snarkdown'
     import { protocolInfo } from './protocolInfo'
@@ -11,7 +12,9 @@
     const { kind }: Props = $props()
 
     const markdown = $derived(protocolInfo[kind])
-    const html = $derived(markdown ? snarkdown(markdown) : undefined)
+    const html = $derived(
+        markdown ? DOMPurify.sanitize(snarkdown(markdown)) : undefined,
+    )
 </script>
 
 {#if html}

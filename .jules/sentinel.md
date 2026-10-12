@@ -1,4 +1,9 @@
-## 2024-10-05 - Avoid returning internal errors with raw internal messages in HTTP APIs
-**Vulnerability:** `poem::Error::from_string(format!("... {e}"))` might leak sensitive information (stack traces, specific DB schemas, proxy targets, network topology) in HTTP error responses returned to clients.
-**Learning:** Returning low-level details (like exact `e` or system state) to a client in a 500 error can provide information useful to attackers. A generic error with an internal log is preferred.
-**Prevention:** Avoid `format!(..., e)` in `poem::Error::from_string(..., INTERNAL_SERVER_ERROR)`. Log the detailed error instead and return a sanitized HTTP message to the client.
+## 2024-05-24 - Cross-Site Scripting (XSS) in Config Warnings and Protocol Docs
+**Vulnerability:** Unsanitized variables `warning` (from `$serverInfo.configWarnings`) and `html` (from `protocolInfo`) were rendered using Svelte's `{@html ...}` directive, potentially exposing the application to Cross-Site Scripting (XSS) if those variables contain malicious HTML.
+**Learning:** Svelte's `{@html}` directive renders content as-is and does not perform any sanitization. Therefore, it is unsafe to use it directly with data that might be controlled or influenced by external sources (like config files or API responses), even if those sources are assumed to be safe.
+**Prevention:** Always sanitize data before using `{@html}`. In this case, `DOMPurify` was introduced and utilized to sanitize the variables before rendering.
+
+## 2024-05-24 - Cross-Site Scripting (XSS) in Config Warnings and Protocol Docs
+**Vulnerability:** Unsanitized variables `warning` (from `$serverInfo.configWarnings`) and `html` (from `protocolInfo`) were rendered using Svelte's `{@html ...}` directive, potentially exposing the application to Cross-Site Scripting (XSS) if those variables contain malicious HTML.
+**Learning:** Svelte's `{@html}` directive renders content as-is and does not perform any sanitization. Therefore, it is unsafe to use it directly with data that might be controlled or influenced by external sources (like config files or API responses), even if those sources are assumed to be safe.
+**Prevention:** Always sanitize data before using `{@html}`. In this case, `DOMPurify` was introduced and utilized to sanitize the variables before rendering.
