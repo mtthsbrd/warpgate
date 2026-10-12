@@ -35,11 +35,13 @@
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@sveltestrap/sveltestrap": "^7",
         "@tsconfig/svelte": "^5.0.8",
+        "@types/dompurify": "^3.2.0",
         "@types/qrcode": "^1.5.6",
         "@types/ua-parser-js": "^0.7.36",
         "@xterm/addon-fit": "^0.11",
         "@xterm/addon-unicode11": "^0.9",
         "@xterm/xterm": "^6.0",
+        "base32-encode": "^2.0.0",
         "bootstrap": "^5.3.8",
         "copy-text-to-clipboard": "^3.2.2",
         "date-fns": "^4.4.0",
@@ -71,6 +73,7 @@
     },
     "dependencies": {
         "@tanstack/svelte-virtual": "^3.13.39",
+        "dompurify": "^3.4.16",
         "natural-orderby": "^5.0.0"
     }
 }
