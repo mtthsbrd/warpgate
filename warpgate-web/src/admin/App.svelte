@@ -2,6 +2,7 @@
     import { faGithub } from '@fortawesome/free-brands-svg-icons'
     import { faBriefcase } from '@fortawesome/free-solid-svg-icons'
     import { Alert } from '@sveltestrap/sveltestrap'
+    import DOMPurify from 'dompurify'
     import AuthBar from 'common/AuthBar.svelte'
     import Brand from 'common/Brand.svelte'
     import Loadable from 'common/Loadable.svelte'
@@ -145,7 +146,7 @@
                     <strong>Issues found:</strong>
                     <ul class="mb-0 mt-2">
                         {#each $serverInfo.configWarnings as warning (warning)}
-                            <li>{@html warning}</li>
+                            <li>{@html DOMPurify.sanitize(warning)}</li>
                         {/each}
                     </ul>
                 </Alert>
