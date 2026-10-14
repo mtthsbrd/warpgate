@@ -4,6 +4,7 @@
     import { Alert } from '@sveltestrap/sveltestrap'
     import AuthBar from 'common/AuthBar.svelte'
     import Brand from 'common/Brand.svelte'
+    import DOMPurify from 'isomorphic-dompurify'
     import Loadable from 'common/Loadable.svelte'
     import Redirect from 'common/Redirect.svelte'
     import RequestsButton from 'common/RequestsButton.svelte'
@@ -145,7 +146,8 @@
                     <strong>Issues found:</strong>
                     <ul class="mb-0 mt-2">
                         {#each $serverInfo.configWarnings as warning (warning)}
-                            <li>{@html warning}</li>
+                            <!-- Security: Sanitize markdown to prevent XSS vulnerabilities when using {@html} -->
+                            <li>{@html DOMPurify.sanitize(warning)}</li>
                         {/each}
                     </ul>
                 </Alert>

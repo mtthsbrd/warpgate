@@ -45,6 +45,7 @@
         "date-fns": "^4.4.0",
         "dequal": "^2.0.3",
         "format-duration": "^4.0.0",
+        "isomorphic-dompurify": "^4.5.0",
         "otpauth": "^9.5.2",
         "qrcode": "^1.5.4",
         "rxjs": "^7.8.2",
