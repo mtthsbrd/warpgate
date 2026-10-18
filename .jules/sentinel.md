@@ -1,4 +1,4 @@
-## 2024-10-05 - Avoid returning internal errors with raw internal messages in HTTP APIs
-**Vulnerability:** `poem::Error::from_string(format!("... {e}"))` might leak sensitive information (stack traces, specific DB schemas, proxy targets, network topology) in HTTP error responses returned to clients.
-**Learning:** Returning low-level details (like exact `e` or system state) to a client in a 500 error can provide information useful to attackers. A generic error with an internal log is preferred.
-**Prevention:** Avoid `format!(..., e)` in `poem::Error::from_string(..., INTERNAL_SERVER_ERROR)`. Log the detailed error instead and return a sanitized HTTP message to the client.
+## 2024-05-24 - [XSS] Sanitize HTML rendering in Svelte
+**Vulnerability:** XSS vulnerability where raw server inputs (config warnings) and markdown rendering (snarkdown) were passed directly to Svelte's `{@html }` directive without sanitization.
+**Learning:** `snarkdown` is used for rendering markdown but does not sanitize HTML, and Svelte's `{@html }` exposes the application to XSS. Also, `isomorphic-dompurify` must be used over `dompurify` to avoid SSR crashes since the Svelte app can be rendered on the server side.
+**Prevention:** Always wrap dynamically generated HTML (like markdown output) or external HTML input (like server warnings) with `DOMPurify.sanitize()` from `isomorphic-dompurify` before passing to `{@html }`.
