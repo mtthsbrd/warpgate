@@ -1,4 +1,5 @@
 <script lang="ts">
+    import DOMPurify from 'isomorphic-dompurify'
     import { logoUrl } from 'common/helpers'
     import { serverInfo } from 'gateway/lib/store'
     import { onDestroy } from 'svelte'
@@ -46,7 +47,7 @@
     <img class="custom-logo" src={logoUrl($serverInfo.logoEtag)} alt="Logo">
 {:else}
     <div bind:this={element} class="brand">
-        {@html logo}
+        {@html DOMPurify.sanitize(logo, { USE_PROFILES: { svg: true } })}
     </div>
 {/if}
 
