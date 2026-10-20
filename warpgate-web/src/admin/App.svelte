@@ -9,6 +9,7 @@
     import RequestsButton from 'common/RequestsButton.svelte'
     import ThemeSwitcher from 'common/ThemeSwitcher.svelte'
     import { reloadServerInfo, serverInfo } from 'gateway/lib/store'
+    import DOMPurify from 'isomorphic-dompurify'
     import { get } from 'svelte/store'
     import Fa from 'svelte-fa'
     import Router, {
@@ -145,7 +146,8 @@
                     <strong>Issues found:</strong>
                     <ul class="mb-0 mt-2">
                         {#each $serverInfo.configWarnings as warning (warning)}
-                            <li>{@html warning}</li>
+                            <!-- Security: Sanitize dynamic HTML configuration warnings to prevent XSS -->
+                            <li>{@html DOMPurify.sanitize(warning)}</li>
                         {/each}
                     </ul>
                 </Alert>

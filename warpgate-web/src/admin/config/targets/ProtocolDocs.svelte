@@ -1,6 +1,7 @@
 <script lang="ts">
     import CollapsibleBlock from 'common/CollapsibleBlock.svelte'
     import type { TargetKind } from 'gateway/lib/api'
+    import DOMPurify from 'isomorphic-dompurify'
     import snarkdown from 'snarkdown'
     import { protocolInfo } from './protocolInfo'
 
@@ -20,7 +21,8 @@
         persistKey="targetProtocolDocsOpen"
         defaultOpen={true}
     >
-        <div class="protocol-info-body small">{@html html}</div>
+        <!-- Security: Sanitize markdown output to prevent XSS -->
+        <div class="protocol-info-body small">{@html DOMPurify.sanitize(html)}</div>
     </CollapsibleBlock>
 {/if}
 

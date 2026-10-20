@@ -71,6 +71,7 @@
     },
     "dependencies": {
         "@tanstack/svelte-virtual": "^3.13.39",
+        "isomorphic-dompurify": "^4.6.0",
         "natural-orderby": "^5.0.0"
     }
 }
