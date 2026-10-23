@@ -24,6 +24,7 @@ use poem::{Body, IntoResponse, Request, Response};
 use poem_openapi::types::ParseFromJSON;
 use serde::Serialize;
 use tokio_tungstenite::{Connector, client_async_tls_with_config, tungstenite};
+use tracing::error;
 use uuid::Uuid;
 use warpgate_ca::CLUSTER_TLS_SNI_NAME;
 use warpgate_common::helpers::websocket::pump_websocket;
@@ -373,8 +374,14 @@ pub async fn parse_forwarded_body<T: ParseFromJSON>(response: Response) -> poem:
         .await
         .map_err(poem::error::InternalServerError)?;
     let value = serde_json::from_slice(&bytes).map_err(poem::error::InternalServerError)?;
-    T::parse_from_json(Some(value))
-        .map_err(|e| poem::Error::from_string(e.into_message(), StatusCode::INTERNAL_SERVER_ERROR))
+    T::parse_from_json(Some(value)).map_err(|e| {
+        // SECURITY: Log the detailed error, but do not return internal details to the client on 500
+        error!(error = %e.into_message(), "Failed to parse forwarded body");
+        poem::Error::from_string(
+            "Failed to parse forwarded body",
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+    })
 }
 
 /// A peer response outside the endpoint's own set of outcomes, surfaced with the
