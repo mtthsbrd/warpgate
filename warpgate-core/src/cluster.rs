@@ -9,7 +9,7 @@ use poem::IntoResponse;
 use poem::web::websocket::{Message, WebSocket};
 use sea_orm::ActiveValue::Set;
 use sea_orm::sea_query::{Expr, IntoCondition, OnConflict};
-use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, QuerySelect};
+use sea_orm::{ColumnTrait, Condition, DatabaseConnection, EntityTrait, QueryFilter, QuerySelect};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tokio::sync::broadcast;
@@ -22,12 +22,15 @@ use warpgate_common::{NodeId, Protocol, UserSessionId, WarpgateError};
 use warpgate_db_entities::{HttpSession, Node, Parameters, TargetSession, UserSession};
 use warpgate_tls::configure_cluster_tls_connector;
 
+use crate::SessionsFilter;
+
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(10);
 const REAP_INTERVAL: Duration = Duration::from_secs(15);
 const HEARTBEAT_TIMEOUT: Duration = Duration::from_secs(30);
 
 pub const NOTIFICATION_TIMEOUT: Duration = Duration::from_secs(10);
 pub const NOTIFICATIONS_ROUTE: &str = "/cluster/notifications";
+pub const CLOSE_SESSIONS_ROUTE: &str = "/cluster/close-sessions";
 
 /// A refresh notification sent between nodes, used to feed UI update websockets
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -105,7 +108,7 @@ impl Cluster {
         self.deliver_local(msg.clone());
         let this = Arc::clone(self);
         tokio::spawn(async move {
-            this.for_each_peer(|peer| this.post_notification(peer.into(), &msg))
+            this.for_each_peer(|peer| this.post_to_peer(peer.into(), NOTIFICATIONS_ROUTE, &msg))
                 .await;
         });
     }
@@ -118,19 +121,25 @@ impl Cluster {
         self.notifications.subscribe()
     }
 
+    pub async fn close_sessions_on_peers(&self, scope: &SessionsFilter) {
+        self.for_each_peer(|peer| self.post_to_peer(peer.into(), CLOSE_SESSIONS_ROUTE, scope))
+            .await;
+    }
+
     // TODO: client pool
-    async fn post_notification(
+    async fn post_to_peer(
         &self,
         peer: RemoteNode,
-        msg: &ClusterNotification,
+        route: &str,
+        body: &impl Serialize,
     ) -> Result<(), WarpgateError> {
         self.peer_request(
             &peer,
             reqwest::Method::POST,
-            &format!("/@warpgate/admin/api{NOTIFICATIONS_ROUTE}"),
+            &format!("/@warpgate/admin/api{route}"),
         )
         .await?
-        .json(msg)
+        .json(body)
         .send()
         .await?
         .error_for_status()?;
@@ -379,49 +388,41 @@ pub fn refresh_notification_stream(
 /// ending a session mid-birth.
 const SHARED_SESSION_ORPHAN_GRACE: time::Duration = time::Duration::minutes(5);
 
-/// bound sessions reap 1/2: mark user sessions matching filter as ended
+/// bound sessions reap 1/2: end user sessions matching filter
 async fn end_connection_bound_sessions(
     db: &DatabaseConnection,
     node_filter: impl IntoCondition,
 ) -> Result<(), WarpgateError> {
-    UserSession::Entity::update_many()
-        .col_expr(
-            UserSession::Column::Ended,
-            Expr::value(OffsetDateTime::now_utc()),
-        )
-        .filter(node_filter)
-        .filter(UserSession::Column::NodeId.is_not_null())
-        .filter(UserSession::Column::Ended.is_null())
-        .exec(db)
-        .await?;
-    Ok(())
+    UserSession::revoke_open_matching(
+        db,
+        Condition::all()
+            .add(node_filter.into_condition())
+            .add(UserSession::Column::NodeId.is_not_null()),
+    )
+    .await
 }
 
 /// End unowned (HTTP browser) sessions whose backing is gone: they are kept
 /// alive by their stored cookie sessions, not by any node.
 async fn end_sessions_without_cookie(db: &DatabaseConnection) -> Result<(), WarpgateError> {
     let grace_cutoff = OffsetDateTime::now_utc() - SHARED_SESSION_ORPHAN_GRACE;
-    UserSession::Entity::update_many()
-        .col_expr(
-            UserSession::Column::Ended,
-            Expr::value(OffsetDateTime::now_utc()),
-        )
-        .filter(UserSession::Column::Protocol.eq(Protocol::Http.name()))
-        .filter(UserSession::Column::NodeId.is_null())
-        .filter(UserSession::Column::Ended.is_null())
-        .filter(UserSession::Column::Started.lt(grace_cutoff))
-        .filter(
-            UserSession::Column::Id.not_in_subquery(
-                sea_orm::sea_query::Query::select()
-                    .column(HttpSession::Column::UserSessionId)
-                    .from(HttpSession::Entity)
-                    .and_where(Expr::col(HttpSession::Column::UserSessionId).is_not_null())
-                    .to_owned(),
+    UserSession::revoke_open_matching(
+        db,
+        Condition::all()
+            .add(UserSession::Column::Protocol.eq(Protocol::Http.name()))
+            .add(UserSession::Column::NodeId.is_null())
+            .add(UserSession::Column::Started.lt(grace_cutoff))
+            .add(
+                UserSession::Column::Id.not_in_subquery(
+                    sea_orm::sea_query::Query::select()
+                        .column(HttpSession::Column::UserSessionId)
+                        .from(HttpSession::Entity)
+                        .and_where(Expr::col(HttpSession::Column::UserSessionId).is_not_null())
+                        .to_owned(),
+                ),
             ),
-        )
-        .exec(db)
-        .await?;
-    Ok(())
+    )
+    .await
 }
 
 /// Safety net: no target access may read as open past its parent. The normal
@@ -600,6 +601,7 @@ mod tests {
             data: Set("{}".into()),
             updated: Set(OffsetDateTime::now_utc()),
             user_session_id: Set(Some(warpgate_common::UserSessionId(user_session_id))),
+            ..Default::default()
         })
         .exec_without_returning(db)
         .await
@@ -775,5 +777,54 @@ mod tests {
 
         assert!(is_user_session_open(&db, ticket_session).await);
         assert!(is_open(&db, ticket_child).await);
+    }
+
+    async fn admitted_by(db: &DatabaseConnection, target_session: Uuid, ticket: Uuid) {
+        TargetSession::Entity::update_many()
+            .col_expr(TargetSession::Column::TicketId, Expr::value(Some(ticket)))
+            .filter(TargetSession::Column::Id.eq(warpgate_common::TargetSessionId(target_session)))
+            .exec(db)
+            .await
+            .unwrap();
+    }
+
+    /// Revoking or expiring a ticket must find exactly the open sessions it
+    /// admitted: not a password session, not one under another live ticket,
+    /// and not one that has already ended.
+    #[tokio::test]
+    async fn ticket_lookup_finds_only_the_sessions_it_admitted() {
+        use warpgate_db_entities::Ticket;
+
+        use crate::approvals::tests::seed_ticket;
+        let db = migrated_db().await;
+        let now = OffsetDateTime::now_utc();
+        let expired = seed_ticket(&db, None, Some(now - time::Duration::minutes(1))).await;
+        let live = seed_ticket(&db, None, Some(now + time::Duration::minutes(1))).await;
+
+        let under_expired = user_session_started(&db, None, Protocol::Ssh, now).await;
+        admitted_by(&db, target_session(&db, under_expired, None).await, expired).await;
+        let under_live = user_session_started(&db, None, Protocol::Ssh, now).await;
+        admitted_by(&db, target_session(&db, under_live, None).await, live).await;
+        let password = user_session_started(&db, None, Protocol::Ssh, now).await;
+        target_session(&db, password, None).await;
+        let ended = user_session_started(&db, None, Protocol::Ssh, now).await;
+        admitted_by(&db, target_session(&db, ended, None).await, expired).await;
+        UserSession::revoke(&db, UserSessionId(ended))
+            .await
+            .unwrap();
+
+        let by_expiry = TargetSession::open_user_sessions_admitted_by_tickets(
+            &db,
+            Ticket::Column::Expiry.lt(now),
+        )
+        .await
+        .unwrap();
+        assert_eq!(by_expiry, vec![UserSessionId(under_expired)]);
+
+        let by_id =
+            TargetSession::open_user_sessions_admitted_by_tickets(&db, Ticket::Column::Id.eq(live))
+                .await
+                .unwrap();
+        assert_eq!(by_id, vec![UserSessionId(under_live)]);
     }
 }

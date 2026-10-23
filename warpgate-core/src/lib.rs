@@ -18,6 +18,7 @@ pub mod login_protection;
 mod protocols;
 pub mod rate_limiting;
 pub mod recordings;
+pub mod resources;
 mod secret_backend_registry;
 mod services;
 mod state;
@@ -31,4 +32,6 @@ pub use listener_status::*;
 pub use protocols::*;
 pub use secret_backend_registry::SecretBackendRegistry;
 pub use services::*;
-pub use state::{SharedSessionHandle, State, UserSessionState, UserSessionStateInit};
+pub use state::{
+    SessionsFilter, SharedSessionHandle, State, UserSessionState, UserSessionStateInit,
+};

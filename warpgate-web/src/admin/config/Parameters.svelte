@@ -185,18 +185,25 @@
             <Alert
                 color="danger"
                 dismissible
-                onclose={() => { updateError = undefined }}
+                onclose={() => {
+                    updateError = undefined
+                }}
                 >{updateError}</Alert
             >
         {/if}
         <Loadable promise={initPromise}>
-            {#snippet children(parameters)}
+            {#snippet children(
+                parameters,
+            )}
                 {#if parameters}
                     <form
                         bind:this={formEl}
                         oninput={refreshValidity}
                         onchange={refreshValidity}
-                        onsubmit={e => { e.preventDefault(); save() }}
+                        onsubmit={e => {
+                            e.preventDefault()
+                            save()
+                        }}
                     >
                         <SectionedForm>
                             <Section id="credentials" title="Credentials">
@@ -229,10 +236,17 @@
                                         type="number"
                                         min="0"
                                         class="form-control"
-                                        value={parameters.passwordPolicy.minLength}
+                                        value={parameters.passwordPolicy
+                                            .minLength}
                                         onchange={e => {
-                                            const v = parseInt(e.currentTarget.value, 10)
-                                            parameters.passwordPolicy.minLength = Number.isNaN(v) ? 0 : Math.max(0, v)
+                                            const v = parseInt(
+                                                e.currentTarget.value,
+                                                10,
+                                            )
+                                            parameters.passwordPolicy.minLength =
+                                                Number.isNaN(v)
+                                                    ? 0
+                                                    : Math.max(0, v)
                                         }}
                                     >
                                 </FormGroup>
@@ -244,7 +258,8 @@
                                         id="requireUppercase"
                                         class="mb-0 me-2"
                                         type="switch"
-                                        bind:checked={parameters.passwordPolicy.requireUppercase}
+                                        bind:checked={parameters.passwordPolicy
+                                            .requireUppercase}
                                     />
                                     <div>Require uppercase letter</div>
                                 </label>
@@ -256,7 +271,8 @@
                                         id="requireLowercase"
                                         class="mb-0 me-2"
                                         type="switch"
-                                        bind:checked={parameters.passwordPolicy.requireLowercase}
+                                        bind:checked={parameters.passwordPolicy
+                                            .requireLowercase}
                                     />
                                     <div>Require lowercase letter</div>
                                 </label>
@@ -268,7 +284,8 @@
                                         id="requireDigits"
                                         class="mb-0 me-2"
                                         type="switch"
-                                        bind:checked={parameters.passwordPolicy.requireDigits}
+                                        bind:checked={parameters.passwordPolicy
+                                            .requireDigits}
                                     />
                                     <div>Require digit</div>
                                 </label>
@@ -280,7 +297,8 @@
                                         id="requireSpecial"
                                         class="mb-0 me-2"
                                         type="switch"
-                                        bind:checked={parameters.passwordPolicy.requireSpecial}
+                                        bind:checked={parameters.passwordPolicy
+                                            .requireSpecial}
                                     />
                                     <div>Require special character</div>
                                 </label>
@@ -377,8 +395,12 @@
                                         <select
                                             id="sshHostKeyVerification"
                                             class="form-select"
-                                            value={parameters.sshHostKeyVerification ?? 'Prompt'}
-                                            onchange={e => parameters.sshHostKeyVerification = e.currentTarget.value as SshHostKeyVerificationMode}
+                                            value={parameters.sshHostKeyVerification ??
+                                                'Prompt'}
+                                            onchange={e =>
+                                                (parameters.sshHostKeyVerification =
+                                                    e.currentTarget
+                                                        .value as SshHostKeyVerificationMode)}
                                         >
                                             <option value="Prompt">
                                                 Ask the user to trust the key
@@ -504,7 +526,10 @@
                                         <DurationInput
                                             label="Default max ticket duration (blank = unlimited)"
                                             seconds={parameters.ticketMaxDurationSeconds}
-                                            onChange={v => { parameters.ticketMaxDurationSeconds = v }}
+                                            onChange={v => {
+                                                parameters.ticketMaxDurationSeconds =
+                                                    v
+                                            }}
                                         />
                                         <HelpText>
                                             Global default. Can be overridden
@@ -520,10 +545,17 @@
                                                 type="number"
                                                 min="1"
                                                 class="form-control"
-                                                value={parameters.ticketMaxUses ?? ''}
+                                                value={parameters.ticketMaxUses ??
+                                                    ''}
                                                 onchange={e => {
-                                                    const v = parseInt(e.currentTarget.value, 10)
-                                                    parameters.ticketMaxUses = Number.isNaN(v) ? undefined : v
+                                                    const v = parseInt(
+                                                        e.currentTarget.value,
+                                                        10,
+                                                    )
+                                                    parameters.ticketMaxUses =
+                                                        Number.isNaN(v)
+                                                            ? undefined
+                                                            : v
                                                 }}
                                             >
                                         </FormGroup>
@@ -535,7 +567,10 @@
                                 <DurationInput
                                     label="Maximum API token duration (blank = unlimited)"
                                     seconds={parameters.maxApiTokenDurationSeconds}
-                                    onChange={v => { parameters.maxApiTokenDurationSeconds = v }}
+                                    onChange={v => {
+                                        parameters.maxApiTokenDurationSeconds =
+                                            v
+                                    }}
                                 />
                             </Section>
 
@@ -576,8 +611,12 @@
                                     <select
                                         id="targetClickAction"
                                         class="form-select"
-                                        value={parameters.targetClickAction ?? 'Connect'}
-                                        onchange={e => parameters.targetClickAction = e.currentTarget.value as TargetClickAction}
+                                        value={parameters.targetClickAction ??
+                                            'Connect'}
+                                        onchange={e =>
+                                            (parameters.targetClickAction = e
+                                                .currentTarget
+                                                .value as TargetClickAction)}
                                     >
                                         <option value="Connect">
                                             Open web terminal
@@ -592,8 +631,12 @@
                                     <select
                                         id="openTargetsInNewTab"
                                         class="form-select"
-                                        value={parameters.openTargetsInNewTab ?? 'DefaultOn'}
-                                        onchange={e => parameters.openTargetsInNewTab = e.currentTarget.value as OpenTargetsInNewTabMode}
+                                        value={parameters.openTargetsInNewTab ??
+                                            'DefaultOn'}
+                                        onchange={e =>
+                                            (parameters.openTargetsInNewTab = e
+                                                .currentTarget
+                                                .value as OpenTargetsInNewTabMode)}
                                     >
                                         <option value="DefaultOn">
                                             New tab by default
@@ -635,8 +678,12 @@
                                         <select
                                             id="passwordLoginMode"
                                             class="form-select"
-                                            value={parameters.passwordLoginMode ?? 'Enabled'}
-                                            onchange={e => parameters.passwordLoginMode = e.currentTarget.value as PasswordLoginMode}
+                                            value={parameters.passwordLoginMode ??
+                                                'Enabled'}
+                                            onchange={e =>
+                                                (parameters.passwordLoginMode =
+                                                    e.currentTarget
+                                                        .value as PasswordLoginMode)}
                                         >
                                             <option value="Enabled">
                                                 Enabled
@@ -662,7 +709,9 @@
                                     <DurationInput
                                         label="Require re-authentication after (blank = never)"
                                         seconds={parameters.webAuthMaxAgeSeconds}
-                                        onChange={v => { parameters.webAuthMaxAgeSeconds = v }}
+                                        onChange={v => {
+                                            parameters.webAuthMaxAgeSeconds = v
+                                        }}
                                     />
                                     <HelpText>
                                         Forces users to sign in again once
@@ -676,7 +725,10 @@
                                 <DurationInput
                                     label="Web approval cache period"
                                     seconds={parameters.webApprovalGracePeriodSeconds}
-                                    onChange={v => { parameters.webApprovalGracePeriodSeconds = v }}
+                                    onChange={v => {
+                                        parameters.webApprovalGracePeriodSeconds =
+                                            v
+                                    }}
                                 />
                                 <HelpText>
                                     After a user approves an in-browser
@@ -694,8 +746,12 @@
                                     <select
                                         id="mfaEnforcement"
                                         class="form-select"
-                                        value={parameters.mfaEnforcement ?? 'Off'}
-                                        onchange={e => parameters.mfaEnforcement = e.currentTarget.value as MfaEnforcement}
+                                        value={parameters.mfaEnforcement ??
+                                            'Off'}
+                                        onchange={e =>
+                                            (parameters.mfaEnforcement = e
+                                                .currentTarget
+                                                .value as MfaEnforcement)}
                                     >
                                         <option value="Off">Off</option>
                                         <option value="Enroll">
@@ -748,7 +804,10 @@
                                 <DurationInput
                                     label="Approval timeout"
                                     seconds={parameters.adminApprovalTimeoutSeconds}
-                                    onChange={v => { parameters.adminApprovalTimeoutSeconds = v }}
+                                    onChange={v => {
+                                        parameters.adminApprovalTimeoutSeconds =
+                                            v
+                                    }}
                                 />
                                 <HelpText>
                                     A session held for administrator approval is
@@ -759,7 +818,10 @@
                                 <DurationInput
                                     label="Admin approval cache period"
                                     seconds={parameters.adminApprovalGracePeriodSeconds}
-                                    onChange={v => { parameters.adminApprovalGracePeriodSeconds = v }}
+                                    onChange={v => {
+                                        parameters.adminApprovalGracePeriodSeconds =
+                                            v
+                                    }}
                                 />
                                 <HelpText>
                                     After an administrator approves a session,
@@ -816,7 +878,10 @@
                                                         class="form-control"
                                                         disabled={!parameters.loginProtectionEnabled}
                                                         value={parameters.lpIpMaxAttempts}
-                                                        onchange={e => { parameters.lpIpMaxAttempts = e.currentTarget.valueAsNumber }}
+                                                        onchange={e => {
+                                                            parameters.lpIpMaxAttempts =
+                                                                e.currentTarget.valueAsNumber
+                                                        }}
                                                     >
                                                 </FormGroup>
                                             </div>
@@ -824,14 +889,24 @@
                                                 <DurationInput
                                                     label="Failure window"
                                                     seconds={parameters.lpIpTimeWindowSeconds}
-                                                    onChange={v => { if (v != null) { parameters.lpIpTimeWindowSeconds = v } }}
+                                                    onChange={v => {
+                                                        if (v != null) {
+                                                            parameters.lpIpTimeWindowSeconds =
+                                                                v
+                                                        }
+                                                    }}
                                                 />
                                             </div>
                                             <div class="col-6">
                                                 <DurationInput
                                                     label="Initial block"
                                                     seconds={parameters.lpIpBaseBlockDurationSeconds}
-                                                    onChange={v => { if (v != null) { parameters.lpIpBaseBlockDurationSeconds = v } }}
+                                                    onChange={v => {
+                                                        if (v != null) {
+                                                            parameters.lpIpBaseBlockDurationSeconds =
+                                                                v
+                                                        }
+                                                    }}
                                                 />
                                             </div>
                                             <div class="col-6">
@@ -848,7 +923,10 @@
                                                         class="form-control"
                                                         disabled={!parameters.loginProtectionEnabled}
                                                         value={parameters.lpIpBlockDurationMultiplier}
-                                                        onchange={e => { parameters.lpIpBlockDurationMultiplier = e.currentTarget.valueAsNumber }}
+                                                        onchange={e => {
+                                                            parameters.lpIpBlockDurationMultiplier =
+                                                                e.currentTarget.valueAsNumber
+                                                        }}
                                                     >
                                                 </FormGroup>
                                             </div>
@@ -856,14 +934,24 @@
                                                 <DurationInput
                                                     label="Max block"
                                                     seconds={parameters.lpIpMaxBlockDurationSeconds}
-                                                    onChange={v => { if (v != null) { parameters.lpIpMaxBlockDurationSeconds = v } }}
+                                                    onChange={v => {
+                                                        if (v != null) {
+                                                            parameters.lpIpMaxBlockDurationSeconds =
+                                                                v
+                                                        }
+                                                    }}
                                                 />
                                             </div>
                                             <div class="col-6">
                                                 <DurationInput
                                                     label="Cooldown reset"
                                                     seconds={parameters.lpIpCooldownResetSeconds}
-                                                    onChange={v => { if (v != null) { parameters.lpIpCooldownResetSeconds = v } }}
+                                                    onChange={v => {
+                                                        if (v != null) {
+                                                            parameters.lpIpCooldownResetSeconds =
+                                                                v
+                                                        }
+                                                    }}
                                                 />
                                             </div>
                                         </div>
@@ -895,7 +983,10 @@
                                                             class="form-control"
                                                             disabled={!parameters.loginProtectionEnabled}
                                                             value={parameters.lpUserMaxAttempts}
-                                                            onchange={e => { parameters.lpUserMaxAttempts = e.currentTarget.valueAsNumber }}
+                                                            onchange={e => {
+                                                                parameters.lpUserMaxAttempts =
+                                                                    e.currentTarget.valueAsNumber
+                                                            }}
                                                         >
                                                     </FormGroup>
                                                 </div>
@@ -903,7 +994,12 @@
                                                     <DurationInput
                                                         label="Failure window"
                                                         seconds={parameters.lpUserTimeWindowSeconds}
-                                                        onChange={v => { if (v != null) { parameters.lpUserTimeWindowSeconds = v } }}
+                                                        onChange={v => {
+                                                            if (v != null) {
+                                                                parameters.lpUserTimeWindowSeconds =
+                                                                    v
+                                                            }
+                                                        }}
                                                     />
                                                 </div>
                                             </div>
@@ -926,7 +1022,12 @@
                                                 <DurationInput
                                                     label="Auto-unlock delay"
                                                     seconds={parameters.lpUserLockoutDurationSeconds}
-                                                    onChange={v => { if (v != null) { parameters.lpUserLockoutDurationSeconds = v } }}
+                                                    onChange={v => {
+                                                        if (v != null) {
+                                                            parameters.lpUserLockoutDurationSeconds =
+                                                                v
+                                                        }
+                                                    }}
                                                     class="mb-2"
                                                 />
                                             {/if}
@@ -961,7 +1062,12 @@
                                             <DurationInput
                                                 label="Keep records for"
                                                 seconds={parameters.loginProtectionRetentionSeconds}
-                                                onChange={v => { if (v != null) { parameters.loginProtectionRetentionSeconds = v } }}
+                                                onChange={v => {
+                                                    if (v != null) {
+                                                        parameters.loginProtectionRetentionSeconds =
+                                                            v
+                                                    }
+                                                }}
                                                 class="mb-3"
                                             />
                                         </Subsection>
@@ -1021,8 +1127,12 @@
                                     <select
                                         id="recordingsStorage"
                                         class="form-select"
-                                        value={parameters.recordingsStorage.kind}
-                                        onchange={e => setStorageKind(e.currentTarget.value)}
+                                        value={parameters.recordingsStorage
+                                            .kind}
+                                        onchange={e =>
+                                            setStorageKind(
+                                                e.currentTarget.value,
+                                            )}
                                     >
                                         <option value="Disk">Local disk</option>
                                         <option value="S3">
@@ -1037,7 +1147,8 @@
                                     the new location manually.
                                 </HelpText>
 
-                                {#if parameters.recordingsStorage.kind === 'Disk'}
+                                {#if parameters.recordingsStorage.kind ===
+                                    'Disk'}
                                     {@const disk = parameters.recordingsStorage}
                                     <FormGroup floating label="Recordings path">
                                         <input
@@ -1046,7 +1157,8 @@
                                             bind:value={disk.path}
                                         >
                                     </FormGroup>
-                                {:else if parameters.recordingsStorage.kind === 'S3'}
+                                {:else if parameters.recordingsStorage.kind ===
+                                    'S3'}
                                     {@const s3 = parameters.recordingsStorage}
                                     <FormGroup floating label="Bucket">
                                         <input
@@ -1079,7 +1191,10 @@
                                             class="form-control"
                                             placeholder="https://minio.example.com:9000"
                                             value={s3.endpoint ?? ''}
-                                            oninput={e => s3.endpoint = e.currentTarget.value || undefined}
+                                            oninput={e =>
+                                                (s3.endpoint =
+                                                    e.currentTarget.value ||
+                                                    undefined)}
                                         >
                                     </FormGroup>
                                     <FormGroup floating label="Key prefix">
@@ -1098,7 +1213,10 @@
                                             class="form-control"
                                             placeholder="data/recordings-scratch"
                                             value={s3.scratchPath ?? ''}
-                                            oninput={e => s3.scratchPath = e.currentTarget.value || undefined}
+                                            oninput={e =>
+                                                (s3.scratchPath =
+                                                    e.currentTarget.value ||
+                                                    undefined)}
                                         >
                                     </FormGroup>
                                     <HelpText>
@@ -1129,7 +1247,10 @@
                                             id="recordingsS3CredentialMode"
                                             class="form-select"
                                             value={s3.credentials.mode}
-                                            onchange={e => setCredentialMode(e.currentTarget.value)}
+                                            onchange={e =>
+                                                setCredentialMode(
+                                                    e.currentTarget.value,
+                                                )}
                                         >
                                             <option value="Auto">
                                                 Automatic (environment or
@@ -1177,7 +1298,9 @@
                                     </AsyncButton>
                                     {#if testResult}
                                         <Alert
-                                            color={testResult.success ? 'success' : 'danger'}
+                                            color={testResult.success
+                                                ? 'success'
+                                                : 'danger'}
                                             class="mt-2 mb-0"
                                         >
                                             {testResult.success
@@ -1200,7 +1323,8 @@
                                     <Button
                                         class="ms-auto"
                                         color="secondary"
-                                        onclick={() => analyticsModalOpen = true}
+                                        onclick={() =>
+                                            (analyticsModalOpen = true)}
                                     >
                                         Change
                                     </Button>
