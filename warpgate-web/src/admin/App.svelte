@@ -9,7 +9,6 @@
     import RequestsButton from 'common/RequestsButton.svelte'
     import ThemeSwitcher from 'common/ThemeSwitcher.svelte'
     import { reloadServerInfo, serverInfo } from 'gateway/lib/store'
-    import DOMPurify from 'isomorphic-dompurify'
     import { get } from 'svelte/store'
     import Fa from 'svelte-fa'
     import Router, {
@@ -119,7 +118,7 @@
             {#if $serverInfo?.username}
                 <a
                     use:link
-                    use:active={{ path: /^\/status\// }}
+                    use:active={{path: /^\/status\//}}
                     href="/status/sessions"
                 >
                     Status
@@ -127,7 +126,7 @@
                 <a
                     use:link
                     use:active
-                    use:active={{ path: /^\/config\// }}
+                    use:active={{path: /^\/config\//}}
                     href="/config"
                 >
                     Config
@@ -146,7 +145,7 @@
                     <strong>Issues found:</strong>
                     <ul class="mb-0 mt-2">
                         {#each $serverInfo.configWarnings as warning (warning)}
-                            <li>{@html DOMPurify.sanitize(warning)}</li>
+                            <li>{@html warning}</li>
                         {/each}
                     </ul>
                 </Alert>
