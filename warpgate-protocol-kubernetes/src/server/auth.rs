@@ -229,8 +229,9 @@ pub async fn authorize_kubernetes_join(
 }
 
 fn target_not_found(target_name: &str) -> poem::Error {
+    tracing::error!("Kubernetes target not found: {target_name}");
     poem::Error::from_string(
-        format!("Kubernetes target not found: {target_name}"),
+        "Kubernetes target not found",
         poem::http::StatusCode::NOT_FOUND,
     )
 }
@@ -472,8 +473,9 @@ async fn authorize_k8s_target<C: ConfigProvider + Send>(
     authorize_for_target(config_provider, identity, target)
         .await?
         .ok_or_else(|| {
+            tracing::error!("Access denied to target: {target_name}");
             poem::Error::from_string(
-                format!("Access denied to target: {target_name}"),
+                "Access denied to target",
                 poem::http::StatusCode::FORBIDDEN,
             )
         })?
@@ -490,8 +492,9 @@ async fn user_for_username(services: &Services, username: &str) -> poem::Result<
         .await
         .context("looking up user in database")?
         .ok_or_else(|| {
+            tracing::error!("User not found after SSO resolution: {username}");
             poem::Error::from_string(
-                format!("User not found after SSO resolution: {username}"),
+                "User not found after SSO resolution",
                 poem::http::StatusCode::UNAUTHORIZED,
             )
         })?;
